@@ -1,21 +1,22 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Add Student</title>
+    <title>Edit Student</title>
     <link rel="stylesheet" href="/style.css">
 </head>
 <body>
 
-<h2>Add Student</h2>
+<h2>Edit Student</h2>
 
-<form action="/add-student" method="POST">
+<form action="/edit-student/<%= student.id %>" method="POST">
     <input
         type="text"
         name="name"
-        placeholder="Enter name"
         required
+        value="<%= student.name %>"
+        
     />
-    <button type="submit">Add</button>
+    <button type="submit">Update</button>
 </form>
 
 <br>
