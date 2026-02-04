@@ -1,67 +1,81 @@
 import express from "express";
+import { fileURLToPath } from "url";
+import path from "path";
 
 const app = express();
 
+// EJS setup
 app.set("view engine", "ejs");
-app.use(express.urlencoded({ extended: true }));
-app.use(express.static("public"));
 
-let StudentList = [
-    { id: 1, name: "jordan" },
-    { id: 2, name: "smith" }
+// Middleware
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// __dirname fix for ES modules
+const __fileName = fileURLToPath(import.meta.url);
+const __dirName = path.dirname(__fileName);
+
+// Static files
+app.use(express.static(path.join(__dirName, "public")));
+
+// Dummy data
+let studentList = [
+  { id: 1, name: "Jordan" },
+  { id: 2, name: "Alice" },
 ];
 
-// SHOW STUDENT LIST
+// Home – Show students
 app.get("/", (req, res) => {
-    res.render("index", { students: StudentList });
+  res.render("index", { studentList });
 });
 
-// SHOW ADD PAGE
+// Add page
 app.get("/add", (req, res) => {
-    res.render("add");
+  res.render("add");
 });
 
-// ADD STUDENT
-app.post("/add-student", (req, res) => {
-    const { name } = req.body;
+// Add student
+app.post("/add", (req, res) => {
+  const { name } = req.body;
 
-    StudentList.push({
-        id: StudentList.length + 1,
-        name
-    });
+  studentList.push({
+    id: Date.now(),
+    name,
+  });
 
-    res.redirect("/");
+  res.redirect("/");
 });
 
-// SHOW EDIT PAGE
+// Edit page
 app.get("/edit/:id", (req, res) => {
-    const id = parseInt(req.params.id);
-    const student = StudentList.find(s => s.id === id);
+  const id = Number(req.params.id);
+  const student = studentList.find((s) => s.id === id);
 
-    res.render("edit", { student });
+  if (!student) return res.status(404).send("Student not found");
+
+  res.render("edit", { student });
 });
 
-// UPDATE STUDENT
-app.post("/edit-student/:id", (req, res) => {
-    const id = parseInt(req.params.id);
-    const { name } = req.body;
+// Update student
+app.post("/edit/:id", (req, res) => {
+  const id = Number(req.params.id);
+  const student = studentList.find((s) => s.id === id);
 
-    StudentList = StudentList.map(student =>
-        student.id === id ? { ...student, name } : student
-    );
+  if (!student) return res.status(404).send("Student not found");
 
-    res.redirect("/");
+  student.name = req.body.name;
+  res.redirect("/");
 });
 
-// DELETE STUDENT
+// Delete student
 app.get("/delete/:id", (req, res) => {
-    const id = parseInt(req.params.id);
-    StudentList = StudentList.filter(student => student.id !== id);
-
-    res.redirect("/");
+  const id = Number(req.params.id);
+  studentList = studentList.filter((s) => s.id !== id);
+  res.redirect("/");
 });
 
+// Server
 const port = 5000;
 app.listen(port, () => {
-    console.log("Server running on port", port);
+   console.log("server running on ", port);
 });

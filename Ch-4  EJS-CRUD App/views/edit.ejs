@@ -1,26 +1,25 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Edit Student</title>
-    <link rel="stylesheet" href="/style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Edit Student</title>
+  <link rel="stylesheet" href="/css/style.css" />
 </head>
 <body>
 
-<h2>Edit Student</h2>
+  <h1>Edit Student</h1>
 
-<form action="/edit-student/<%= student.id %>" method="POST">
+  <form action="/edit/<%= student.id %>" method="post">
+    <label>Name</label>
     <input
-        type="text"
-        name="name"
-        required
-        value="<%= student.name %>"
-        
+      type="text"
+      name="name"
+      value="<%= student.name %>"
+      required
     />
-    <button type="submit">Update</button>
-</form>
-
-<br>
-<a href="/">⬅ Back</a>
+    <button type="submit">Update Student</button>
+  </form>
 
 </body>
 </html>
