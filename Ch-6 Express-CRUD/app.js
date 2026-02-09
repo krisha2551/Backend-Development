@@ -34,7 +34,7 @@ app.get("/taskList",(req,res)=>{
     return res.status(200).json("Task list is empty");
   }
 
-  res.status(200).json({message: "Task list data retrieved successfully",tasksList});
+  res.status(200).json({message: "Task list data retrieved successfully",taskList});
 
 });
 
@@ -69,6 +69,31 @@ app.post("/addTask", (req, res) => {
   res.status(201).json({message:"New task added",newTaskData})
 
 });  
+
+
+// update partial task (PATCH)
+app.patch("/updateTask/:id", (req, res) => {
+
+  const id = Number(req.params.id);
+  const { task, description } = req.body;
+
+  const existingTask = taskList.find((t) => t.id === id);
+
+  if (!existingTask) {
+    return res.status(404).json("Task not found");
+  }
+
+  if (task) existingTask.task = task;
+  if (description) existingTask.description = description;
+
+  res.status(200).json({
+    message: "Task partially updated",
+    updatedTask: existingTask
+  });
+});
+
+
+
 
 // undefined routes handling
 app.use((req, res, next) => {
