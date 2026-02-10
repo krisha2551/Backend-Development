@@ -71,10 +71,12 @@ app.post("/addTask", (req, res) => {
 });  
 
 
-// update partial task (PATCH)
+// update task (PATCH)
+
 app.patch("/updateTask/:id", (req, res) => {
 
   const id = Number(req.params.id);
+
   const { task, description } = req.body;
 
   const existingTask = taskList.find((t) => t.id === id);
@@ -84,15 +86,58 @@ app.patch("/updateTask/:id", (req, res) => {
   }
 
   if (task) existingTask.task = task;
+
   if (description) existingTask.description = description;
 
   res.status(200).json({
-    message: "Task partially updated",
+    message: "Task updated successfully using PATCH",
     updatedTask: existingTask
   });
 });
 
+// update full task (PUT)
+app.put("/updateTask/:id", (req, res) => {
 
+  const id = Number(req.params.id);
+
+  const { task, description } = req.body;
+
+  const taskIndex = taskList.findIndex((t) => t.id === id);
+
+  if (taskIndex === -1) {
+    return res.status(404).json("Task not found");
+  }
+
+  taskList[taskIndex] = {
+    id,
+    task,
+    description
+  };
+
+  res.status(200).json({
+    message: "Task updated successfully",
+    updatedTask: taskList[taskIndex]
+  });
+});
+
+
+// delete task
+app.delete("/deleteTask/:id", (req, res) => {
+  const id = Number(req.params.id);
+
+  const taskIndex = taskList.findIndex((t) => t.id === id);
+
+  if (taskIndex === -1) {
+    return res.status(404).json("Task not found");
+  }
+
+  const deletedTask = taskList.splice(taskIndex, 1);
+
+  res.status(200).json({
+    message: "Task deleted successfully",
+    deletedTask
+  });
+});
 
 
 // undefined routes handling
