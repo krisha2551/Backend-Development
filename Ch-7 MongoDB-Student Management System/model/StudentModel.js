@@ -19,7 +19,6 @@ const studentSchema = new mongoose.Schema(
       required: true,
       trim: true,
       unique: true,
-     
     },
 
     phoneNumber: {
@@ -36,11 +35,9 @@ const studentSchema = new mongoose.Schema(
 
     isActive: {
       type: String,
-      enum: ["ACTIVE", "INACTIVE"],
-      default: "ACTIVE",
+      default: true,
     },
   },
-
   { timestamps: true }
 );
 

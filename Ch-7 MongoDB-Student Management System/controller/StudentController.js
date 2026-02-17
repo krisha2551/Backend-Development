@@ -1,19 +1,11 @@
 import Student from "../model/StudentModel.js";
-
 import HttpError from "../middleware/httpError.js";
 
-
+// CREATE STUDENT
 const createStudent = async (req, res, next) => {
   try {
-
-    const {
-      firstName,
-      lastName,
-      email,
-      phoneNumber,
-      course,
-      isActive,
-    } = req.body;
+    const { firstName, lastName, email, phoneNumber, course, isActive } =
+      req.body;
 
     const student = new Student({
       firstName,
@@ -24,35 +16,26 @@ const createStudent = async (req, res, next) => {
       isActive,
     });
 
-    const studentDetail = await new StudentModel(newStudent);
-
     await student.save();
 
     res.status(201).json({
-
       message: "Student created successfully",
       student,
-
     });
-
   } catch (error) {
-
+    if (error.code === 11000) {
+      return next(new HttpError("Email already exists", 400));
+    }
     next(new HttpError(error.message, 500));
   }
-  
 };
 
 // GET ALL STUDENTS
-
 const allStudent = async (req, res, next) => {
-
   try {
-
     const students = await Student.find({});
 
-  
     if (!students || students.length === 0) {
-      
       return next(new HttpError("No students found", 404));
     }
 
@@ -60,8 +43,30 @@ const allStudent = async (req, res, next) => {
       message: "All students fetched successfully",
       students,
     });
-
   } catch (error) {
+    next(new HttpError(error.message, 500));
+  }
+};
+
+// GET STUDENT BY ID
+const StudentById = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    const student = await Student.findById(id);
+
+    if (!student) {
+      return next(new HttpError("Student not found", 404));
+    }
+
+    res.status(200).json({
+      message: "Student fetched successfully",
+      student,
+    });
+  } catch (error) {
+    if (error.name === "CastError") {
+      return next(new HttpError("Invalid student ID", 400));
+    }
     next(new HttpError(error.message, 500));
   }
 };
@@ -69,4 +74,5 @@ const allStudent = async (req, res, next) => {
 export default {
   createStudent,
   allStudent,
+  StudentById,
 };
