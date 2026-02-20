@@ -30,7 +30,7 @@ const studentSchema = new mongoose.Schema(
     course: {
       type: String,
       required: true,
-      enum: ["BCA", "BSc", "MCA", "MBA"],
+      enum: ["BCA", "BSc", "MCA", "MBA", "MERN Stack"],
     },
 
     isActive: {

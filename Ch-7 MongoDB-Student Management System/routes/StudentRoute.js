@@ -12,7 +12,8 @@ router.get("/allStudentData", StudentController.allStudent);
 // GET STUDENT BY ID
 router.get("/:id", StudentController.StudentById);
 
-
+// UPDATE STUDENT (PATCH)  👈 ADD THIS
+router.patch("/:id", StudentController.updateStudent);
 
 // DELETE STUDENT
 router.delete("/:id", StudentController.deleteStudent);

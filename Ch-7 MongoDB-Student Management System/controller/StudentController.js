@@ -84,23 +84,61 @@ const StudentById = async (req, res, next) => {
 };
 
 
-// UPDATE STUDENT (PATCH)
 
-const patchStudent = async (req, res, next) => {
+// UPDATE STUDENT (PATCH) - Using findByIdAndUpdate
+
+const updateStudent = async (req, res, next) => {
   try {
 
-    const { id } = req.params.id;
+    const { id } = req.params;
+
+    const allowedFields = [
+      "firstName",
+      "lastName",
+      "email",
+      "phoneNumber",
+      "course",
+      "isActive"
+    ];
+
+    const updateData = {};
+
+    Object.keys(req.body).forEach((key) => {
+
+      if (allowedFields.includes(key)) {
+        
+        updateData[key] = req.body[key];
+      }
+    });
 
     const student = await Student.findByIdAndUpdate(
       id,
-      req.body,
-      { 
-        new: true
-
+      updateData,
+      {
+        new: true   
       }
     );
 
-    
+    if (!student) {
+      return next(new HttpError("Student not found", 404));
+    }
+
+    res.status(200).json({
+      message: "Student updated successfully",
+      student,
+    });
+
+  } catch (error) {
+
+    if (error.name === "CastError") {
+      return next(new HttpError("Invalid student ID", 400));
+    }
+
+    if (error.code === 11000) {
+      return next(new HttpError("Email already exists", 400));
+    }
+
+    next(new HttpError(error.message, 500));
   }
 };
 
@@ -138,5 +176,6 @@ export default {
   createStudent,
   allStudent,
   StudentById,
+  updateStudent,
   deleteStudent,
 };
