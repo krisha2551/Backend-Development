@@ -1,8 +1,9 @@
-import Student from "../model/StudentModel.js";
+import StudentModel from "../model/StudentModel.js";
 
-import HttpError from "../middleware/httpError.js";
+import HttpError from "../middleware/HttpError.js";
 
 // CREATE STUDENT
+
 const createStudent = async (req, res, next) => {
   try {
 
@@ -15,131 +16,127 @@ const createStudent = async (req, res, next) => {
       isActive 
     } = req.body;
 
-    const student = new Student({
+    const newStudent = {
       firstName,
       lastName,
       email,
       phoneNumber,
       course,
       isActive,
-    });
+    };
 
-    await student.save();
+    const studentDetail = new StudentModel(newStudent);
+
+    await studentDetail.save();
 
     res.status(201).json({
-      message: "Student created successfully",
-      student,
+      message: "student detail saved",
+      studentDetail,
     });
   } catch (error) {
-    if (error.code === 11000) {
-      return next(new HttpError("Email already exists", 400));
-    }
     next(new HttpError(error.message, 500));
   }
+  
 };
+
+
 
 // GET ALL STUDENTS
 
 const allStudent = async (req, res, next) => {
   try {
 
-    const students = await Student.find({});
+    const studentList = await StudentModel.find({});
 
-    if (!students || students.length === 0) {
-      return next(new HttpError("No students found", 404));
+    if (!studentList.length) {
+      return next(new HttpError("no student data found", 404));
     }
 
     res.status(200).json({
-      message: "All students fetched successfully",
-      students,
+      message: "student data received successfully",
+      studentList,
     });
   } catch (error) {
     next(new HttpError(error.message, 500));
   }
+
 };
 
-// GET STUDENT BY 
 
-const StudentById = async (req, res, next) => {
+
+// GET STUDENT BY ID
+
+const studentById = async (req, res, next) => {
   try {
 
-    const { id } = req.params;
+    const id = req.params.id;
 
-    const student = await Student.findById(id);
+    const student = await StudentModel.findById(id);
 
     if (!student) {
-      return next(new HttpError("Student not found", 404));
+      return next(new HttpError("student not found with this id", 404));
     }
 
     res.status(200).json({
-      message: "Student fetched successfully",
+      message: "student found",
       student,
     });
   } catch (error) {
-    if (error.name === "CastError") {
-      return next(new HttpError("Invalid student ID", 400));
-    }
-    next(new HttpError(error.message, 500));
+    next(new HttpError("invalid student id", 400));
   }
+
 };
 
 
 
-// UPDATE STUDENT (PATCH) - Using findByIdAndUpdate
+// PATCH UPDATE (Manual Field Validation)
 
 const updateStudent = async (req, res, next) => {
   try {
 
-    const { id } = req.params;
+    const id = req.params.id;
 
-    const allowedFields = [
+    const existingStudent = await StudentModel.findById(id);
+
+    if (!existingStudent) {
+      return next(new HttpError("student id not found", 404));
+    }
+
+    const updates = Object.keys(req.body);
+
+    const allowedUpdates = [
       "firstName",
       "lastName",
       "email",
       "phoneNumber",
       "course",
-      "isActive"
+      "isActive",
     ];
 
-    const updateData = {};
-
-    Object.keys(req.body).forEach((key) => {
-
-      if (allowedFields.includes(key)) {
-        
-        updateData[key] = req.body[key];
-      }
-    });
-
-    const student = await Student.findByIdAndUpdate(
-      id,
-      updateData,
-      {
-        new: true   
-      }
+    const isValidUpdates = updates.every((field) =>
+      allowedUpdates.includes(field)
     );
 
-    if (!student) {
-      return next(new HttpError("Student not found", 404));
+    if (!isValidUpdates) {
+      return next(
+        new HttpError("only allowed fields can be updated", 400)
+      );
     }
 
-    res.status(200).json({
-      message: "Student updated successfully",
-      student,
+    updates.forEach((field) => {
+      existingStudent[field] = req.body[field];
     });
 
+    await existingStudent.save();
+
+    res.status(200).json({
+      message: "student data updated successfully",
+      existingStudent,
+    });
   } catch (error) {
-
-    if (error.name === "CastError") {
-      return next(new HttpError("Invalid student ID", 400));
-    }
-
-    if (error.code === 11000) {
-      return next(new HttpError("Email already exists", 400));
-    }
-
     next(new HttpError(error.message, 500));
   }
+
 };
 
 
@@ -149,33 +146,28 @@ const updateStudent = async (req, res, next) => {
 const deleteStudent = async (req, res, next) => {
   try {
 
-    const { id } = req.params;
+    const id = req.params.id;
 
-    const student = await Student.findByIdAndDelete(id);
+    const deletedStudent = await StudentModel.findByIdAndDelete(id);
 
-    if (!student) {
-      return next(new HttpError("Student not found", 404));
+    if (!deletedStudent) {
+      return next(new HttpError("student not found", 404));
     }
 
     res.status(200).json({
-      message: "Student deleted successfully",
-      student,
+      message: "student data deleted successfully",
     });
   } catch (error) {
-    
-    if (error.name === "CastError") {
-      return next(new HttpError("Invalid student ID", 400));
-    }
     next(new HttpError(error.message, 500));
   }
-};
 
+};
 
 
 export default {
   createStudent,
   allStudent,
-  StudentById,
-  updateStudent,
+  studentById,
   deleteStudent,
+  updateStudent,
 };

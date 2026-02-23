@@ -1,4 +1,5 @@
 import express from "express";
+
 import StudentController from "../controller/StudentController.js";
 
 const router = express.Router();
@@ -10,13 +11,12 @@ router.post("/", StudentController.createStudent);
 router.get("/allStudentData", StudentController.allStudent);
 
 // GET STUDENT BY ID
-router.get("/:id", StudentController.StudentById);
+router.get("/:id", StudentController.studentById);
 
-// UPDATE STUDENT (PATCH)  👈 ADD THIS
+// UPDATE STUDENT (PATCH)
 router.patch("/:id", StudentController.updateStudent);
 
 // DELETE STUDENT
 router.delete("/:id", StudentController.deleteStudent);
-
 
 export default router;
