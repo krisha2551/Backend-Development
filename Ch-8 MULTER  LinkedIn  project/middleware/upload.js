@@ -1,13 +1,14 @@
 import multer from "multer";
 import HttpError from "./httpError.js";
+import path from "path";
 
 // Storage
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "uploads/");
+    cb(null, "uploads");
   },
   filename: (req, file, cb) => {
-    const uniqueName = Date.now() + "-" + file.originalname;
+    const uniqueName =file.fieldname + "-" + Date.now() + "-" + file.originalname;
     cb(null, uniqueName);
   },
 });
