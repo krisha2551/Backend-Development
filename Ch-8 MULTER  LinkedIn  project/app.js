@@ -10,6 +10,7 @@ app.use(express.json());
 
 app.use("/profile", profileRoutes);
 
+
 // Home route
 app.get("/", (req, res) => {
   res.status(200).json({ message: "Welcome to LinkedIn Profile" });

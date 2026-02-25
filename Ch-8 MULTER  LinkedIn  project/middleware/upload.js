@@ -8,7 +8,7 @@ const storage = multer.diskStorage({
     cb(null, "uploads");
   },
   filename: (req, file, cb) => {
-    const uniqueName =file.fieldname + "-" + Date.now() + "-" + file.originalname;
+    const uniqueName =file.fieldname + "-" + Date.now() + path.extname(file.originalname);
     cb(null, uniqueName);
   },
 });
@@ -25,7 +25,7 @@ const fileFilter = (req, file, cb) => {
   ];
 
   if (!allowedFiles.includes(file.mimetype)) {
-    return cb(new HttpError("Unsupported file type", 400));
+    return cb(new HttpError("Unsupported file type", 400),false);
   }
 
   cb(null, true);

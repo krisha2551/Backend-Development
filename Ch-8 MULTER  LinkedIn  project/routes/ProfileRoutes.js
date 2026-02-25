@@ -9,7 +9,7 @@ router.post(
   upload.fields([
     { name: "profileImage", maxCount: 1 },
     { name: "resume", maxCount: 1 },
-    { name: "projectImage", maxCount: 3 },
+    { name: "projectImages", maxCount: 3 },
     { name: "introVideo", maxCount: 1 },
   ]),
   createProfile
