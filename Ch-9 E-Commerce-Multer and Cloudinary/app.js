@@ -20,7 +20,7 @@ app.use(express.json());
 
 // Home route
 app.get("/", (req, res) => {
-  res.status(200).json({ message: "Welcome to" });
+  res.status(200).json({ message: "Welcome to E-Commerce-Multer and Cloudinary" });
 });
 
 
