@@ -3,9 +3,10 @@ import dotenv from "dotenv";
 import cors from "cors";
 import connectDB from "./config/db.js";
 import HttpError from "./middleware/httpError.js";
+import productRoutes from "./routes/productRoutes.js";
 
 // Load .env file
-dotenv.config({ path: "./.env" });
+dotenv.config();
 
 // Check if env is working
 console.log("PORT:", process.env.PORT);
@@ -16,6 +17,10 @@ const app = express();
 app.use(cors());
 
 app.use(express.json());
+
+
+// Routes
+app.use("/products", productRoutes);
 
 
 // Home route
