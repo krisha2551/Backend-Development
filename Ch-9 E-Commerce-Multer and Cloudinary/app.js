@@ -5,60 +5,47 @@ import connectDB from "./config/db.js";
 import HttpError from "./middleware/httpError.js";
 import productRoutes from "./routes/productRoutes.js";
 
-// Load .env file
-dotenv.config();
-
-// Check if env is working
-console.log("PORT:", process.env.PORT);
+dotenv.config({path:"./.env"});
 
 const app = express();
 
 // Middlewares
 app.use(cors());
-
 app.use(express.json());
-
 
 // Routes
 app.use("/products", productRoutes);
 
-
-// Home route
+// Home
 app.get("/", (req, res) => {
-  res.status(200).json({ message: "Welcome to E-Commerce-Multer and Cloudinary" });
+  res.status(200).json({
+    message: "E-Commerce Running 🚀",
+  });
 });
 
-
-// Undefined routes
+// 404 Handler
 app.use((req, res, next) => {
   next(new HttpError("Requested route not found", 404));
 });
 
 
-// middleware
 app.use((error, req, res, next) => {
-  if (res.headersSent) {
-    return next(error);
-  }
-
   res.status(error.statusCode || 500).json({
+    success: false,
     message: error.message || "Internal Server Error",
   });
 });
 
-
 const PORT = process.env.PORT || 5000;
-
-
 
 const startServer = async () => {
   try {
     await connectDB();
-    app.listen(PORT, () => {
-      console.log(`Server running on port ${PORT}`);
-    });
+    app.listen(PORT, () =>
+      console.log(`Server running on port ${PORT}`)
+    );
   } catch (error) {
-    console.log(error.message);
+    console.error(error.message);
     process.exit(1);
   }
 };

@@ -20,6 +20,7 @@ export const addProduct = async (req, res, next) => {
       description,
       price,
       category,
+      image:req.file.path,
       imagePublicId: req.file.filename,
     });
 

@@ -5,7 +5,7 @@ import cloudinary from "../config/cloudinary.js";
 const storage = new CloudinaryStorage({
   cloudinary,
   params: {
-    folder: "ecommerce_products",
+    folder: "e-commerce_products",
     format: async () => "webp",
     allowed_formats: ["jpg", "jpeg", "png"],
     transformation: [
