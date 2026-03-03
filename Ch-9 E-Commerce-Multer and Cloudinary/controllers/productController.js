@@ -1,7 +1,7 @@
 import Product from "../model/Product.js";
 import HttpError from "../middleware/httpError.js";
 
-export const addProduct = async (req, res, next) => {
+const createProduct = async (req, res, next) => {
   try {
 
     const { 
@@ -20,8 +20,8 @@ export const addProduct = async (req, res, next) => {
       description,
       price,
       category,
-      image:req.file.path,
-      imagePublicId: req.file.filename,
+      productImage: req.file.path,
+      cloudinary_Id: req.file.filename,
     });
 
     res.status(201).json({
@@ -31,4 +31,10 @@ export const addProduct = async (req, res, next) => {
   } catch (error) {
     next(error);
   }
+};
+
+
+export default {
+   createProduct,
+
 };

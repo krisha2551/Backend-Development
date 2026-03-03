@@ -6,7 +6,7 @@ const storage = new CloudinaryStorage({
   cloudinary,
   params: {
     folder: "e-commerce_products",
-    format: async () => "webp",
+    format: "webp",
     allowed_formats: ["jpg", "jpeg", "png"],
     transformation: [
       {
