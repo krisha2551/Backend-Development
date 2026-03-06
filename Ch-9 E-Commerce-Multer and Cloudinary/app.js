@@ -11,10 +11,12 @@ const app = express();
 
 // Middlewares
 app.use(cors());
+
 app.use(express.json());
 
 // Routes
 app.use("/products", productRoutes);
+
 
 // Home
 app.get("/", (req, res) => {
@@ -22,6 +24,7 @@ app.get("/", (req, res) => {
     message: "E-Commerce Running 🚀",
   });
 });
+
 
 // 404 Handler
 app.use((req, res, next) => {
@@ -36,7 +39,9 @@ app.use((error, req, res, next) => {
   });
 });
 
+
 const PORT = process.env.PORT || 5000;
+
 
 const startServer = async () => {
   try {
