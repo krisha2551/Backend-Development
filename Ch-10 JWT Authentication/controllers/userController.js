@@ -2,10 +2,15 @@ import User from "../model/User.js";
 import HttpError from "../middleware/httpError.js";
 
 // CREATE USER
-const createUser = async (req, res, next) => {
+const add = async (req, res, next) => {
   try {
 
-    const { name, email, password } = req.body;
+    const 
+    { 
+      name, 
+      email, 
+      password 
+    } = req.body;
 
     const user = await User.create({
       name,
@@ -23,4 +28,27 @@ const createUser = async (req, res, next) => {
   }
 };
 
-export default createUser;
+
+// LOGIN USER 
+const login = async (req, res, next) => {
+  try {
+    const { email, password } = req.body;
+
+    const user = await User.findByCredentials(email, password);
+
+    if (!user) {
+      return next(new HttpError("unable to login", 400));
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Login successful",
+      user
+    });
+
+  } catch (error) {
+    next(new HttpError(error.message, 400));
+  }
+};
+
+export default { add, login };

@@ -9,7 +9,7 @@ dotenv.config({ path: "./.env" });
 
 const app = express();
 
-// Middlewares
+// Middleware
 app.use(express.json());
 
 // Routes
