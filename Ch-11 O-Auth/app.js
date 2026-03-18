@@ -12,6 +12,10 @@ import passport from "./config/passport.js";
 
 const app = express();
 
+// Routes
+app.use("/auth", authRoutes);
+
+
 app.use(express.json());
 
 // EJS
@@ -20,8 +24,6 @@ app.set("view engine", "ejs");
 // Passport
 app.use(passport.initialize());
 
-// Routes
-app.use("/", authRoutes);
 
 
 // Home
@@ -30,10 +32,6 @@ app.get("/", (req, res) => {
 });
 
 
-// Login page
-app.get("/login", (req, res) => {
-  res.render("login");
-});
 
 // 404
 app.use((req, res, next) => {

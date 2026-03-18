@@ -4,10 +4,14 @@ import passport from "passport";
 const router = express.Router();
 
 
+// Login page
+router.get("/login", (req, res) => {
+  res.render("login");
+});
 
 // Google login
 router.get(
-  "/auth/google",
+  "/google",
   passport.authenticate("google", {
     scope: ["profile", "email"],
   })
@@ -15,12 +19,12 @@ router.get(
 
 // Callback
 router.get(
-  "/auth/google/redirect",
+  "/google/redirect",
   passport.authenticate("google", {
     failureRedirect: "/login",
   }),
   (req, res) => {
-    res.redirect("/");
+    res.send("this callback uri");
   }
 );
 
