@@ -1,10 +1,9 @@
 import dotenv from "dotenv";
-dotenv.config({ path: "./.env" }); 
-
+dotenv.config({ path: "./.env" });
 
 import passport from "passport";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
-
+import User from "../models/User.js";
 
 passport.use(
   new GoogleStrategy(
@@ -13,10 +12,22 @@ passport.use(
       clientSecret: process.env.CLIENT_SECRET,
       callbackURL: "/auth/google/redirect",
     },
-    async (accessToken, refreshToken, profile, done) => {
-      console.log("Google Profile:", profile);
+    async (accessToken, refreshToken, profile, cb) => {
+      try {
+        let user = await User.findOne({ googleId: profile.id });
 
-        return done(null, profile);
+        if (!user) {
+          user = await User.create({
+            name: profile.displayName,
+            email: profile.emails[0]?.value,
+            googleId: profile.id,
+          });
+        }
+
+        return cb(null, user);
+      } catch (error) {
+        return cb(error, null);
+      }
     }
   )
 );

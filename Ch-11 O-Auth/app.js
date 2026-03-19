@@ -1,19 +1,16 @@
 import dotenv from "dotenv";
-dotenv.config({ path: "./.env" }); 
+dotenv.config({ path: "./.env" });
 
 import express from "express";
+// import session from "express-session";
 
 import HttpError from "./middleware/HttpError.js";
 import connectDB from "./config/db.js";
 
 import authRoutes from "./routes/authRoutes.js";
-
 import passport from "./config/passport.js";
 
 const app = express();
-
-// Routes
-app.use("/auth", authRoutes);
 
 
 app.use(express.json());
@@ -21,16 +18,29 @@ app.use(express.json());
 // EJS
 app.set("view engine", "ejs");
 
+// Session 
+// app.use(
+//   session({
+//     secret: process.env.SESSION_SECRET,
+//     resave: false,
+//     saveUninitialized: false,
+//   })
+// );
+
+
 // Passport
 app.use(passport.initialize());
+// app.use(passport.session());
 
+
+// Routes
+app.use("/auth", authRoutes);
 
 
 // Home
 app.get("/", (req, res) => {
   res.render("home");
 });
-
 
 
 // 404

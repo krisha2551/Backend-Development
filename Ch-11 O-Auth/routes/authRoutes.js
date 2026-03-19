@@ -22,9 +22,10 @@ router.get(
   "/google/redirect",
   passport.authenticate("google", {
     failureRedirect: "/login",
+    session:false
   }),
   (req, res) => {
-    res.send("this callback uri");
+    res.send("This callback uri");
   }
 );
 
