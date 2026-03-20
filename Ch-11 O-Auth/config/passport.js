@@ -19,7 +19,7 @@ passport.use(
         if (!user) {
           user = await User.create({
             name: profile.displayName,
-            email: profile.emails[0]?.value,
+            email: profile.emails?.[0]?.value,
             googleId: profile.id,
           });
         }
@@ -32,6 +32,18 @@ passport.use(
   )
 );
 
+// Serialize
+passport.serializeUser((user, done) => {
+  done(null, user.id);
+});
 
+// Deserialize
+passport.deserializeUser(async (id, done) => {
+
+    const validUser = await User.findOne(id);
+    done(validUser);
+  
+  }
+);
 
 export default passport;

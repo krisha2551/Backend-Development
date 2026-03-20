@@ -3,7 +3,6 @@ import passport from "passport";
 
 const router = express.Router();
 
-
 // Login page
 router.get("/login", (req, res) => {
   res.render("login");
@@ -21,14 +20,12 @@ router.get(
 router.get(
   "/google/redirect",
   passport.authenticate("google", {
-    failureRedirect: "/login",
+    failureRedirect: "/auth/login",
     session:false
   }),
   (req, res) => {
-    res.send("This callback uri");
+    res.render("profile"); 
   }
 );
-
-
 
 export default router;
