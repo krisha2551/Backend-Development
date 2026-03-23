@@ -16,8 +16,10 @@ const app = express();
 // Middleware
 app.use(express.json());
 
+
 // EJS
 app.set("view engine", "ejs");
+
 
 // Session
 app.use(
@@ -32,23 +34,28 @@ app.use(
   })
 );
 
+
 // Passport
 app.use(passport.initialize());
 app.use(passport.session());
 
+
 // Routes
 app.use("/auth", authRoutes);
 app.use("/", profileRoutes);
+
 
 // Home
 app.get("/", (req, res) => {
   res.render("home", { user: req.user });
 });
 
+
 // 404
 app.use((req, res, next) => {
   next(new HttpError("Requested route not found", 404));
 });
+
 
 // Error handler
 app.use((error, req, res, next) => {
@@ -59,6 +66,7 @@ app.use((error, req, res, next) => {
   });
 });
 
+
 // Start server
 async function startServer() {
   try {
@@ -67,7 +75,7 @@ async function startServer() {
     const port = process.env.PORT || 5000;
 
     app.listen(port, () => {
-      console.log(`server running on port ${port}`);
+      console.log(`Server running on port ${port}`);
     });
   } catch (error) {
     console.log(error.message);
@@ -75,4 +83,4 @@ async function startServer() {
   }
 }
 
-startServer();   
+startServer();

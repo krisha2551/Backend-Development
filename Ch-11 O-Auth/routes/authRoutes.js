@@ -8,6 +8,7 @@ router.get("/login", (req, res) => {
   res.render("login");
 });
 
+
 // Google login
 router.get(
   "/google",
@@ -16,16 +17,24 @@ router.get(
   })
 );
 
+
 // Callback
 router.get(
   "/google/redirect",
   passport.authenticate("google", {
     failureRedirect: "/auth/login",
-    session:false
   }),
   (req, res) => {
-    res.render("profile"); 
+    res.redirect("/profile");
   }
 );
+
+
+// Logout
+router.get("/logout", (req, res) => {
+  req.logout(() => {
+    res.redirect("/");
+  });
+});
 
 export default router;

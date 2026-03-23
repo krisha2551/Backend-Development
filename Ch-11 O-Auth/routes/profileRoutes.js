@@ -15,5 +15,4 @@ const checkAuth = (req, res, next) => {
 router.get("/profile", checkAuth, (req, res) => {
   res.render("profile", { user: req.user });
 });
-
 export default router;
