@@ -6,22 +6,28 @@ const add = async (req, res, next) => {
   try {
     const { name, email, password, phone } = req.body;
 
-    const user = await User.create({
+     const newUser = {
       name,
       email,
       password,
       phone,
-    });
+    };
 
+    const user = new User(newUser);
 
+    const token = await user.generateAuthToken();
+
+    
     res.status(201).json({
       success: true,
       user,
+      token
     });
   } catch (error) {
-    next(error);
+    next(new HttpError(error.message, 500));
   }
 };
+
 
 // LOGIN USER
 const login = async (req, res, next) => {
@@ -34,14 +40,36 @@ const login = async (req, res, next) => {
       return next(new HttpError("unable to login", 400));
     }
 
+     const token = await user.generateAuthToken();
+
     res.status(200).json({
       success: true,
       message: "Login successful",
-      user
+      user,
+      token
     });
 
   } catch (error) {
-    next(new HttpError(error.message, 400));
+    next(new HttpError(error.message, 500));
   }
 };
-export default { add, login };
+
+
+// PROTECTED ROUTE
+const authLogin = async (req, res, next) => {
+  try {
+    const user = req.user;
+
+    if (!user) {
+      return next(new HttpError("unable to login", 401));
+    }
+
+    res.status(200).json({ success: true, user });
+  } catch (error) {
+    next(new HttpError(error.message, 500));
+  }
+};
+
+
+
+export default { add, login, authLogin };
