@@ -34,6 +34,14 @@ const UserSchema = new mongoose.Schema(
       default: "customer",
     },
 
+    profilePic: {
+      type: String,
+    },
+    
+    cloudinaryId: {
+      type: String,
+    },
+
     isVerified: {
       type: Boolean,
       default: false,
