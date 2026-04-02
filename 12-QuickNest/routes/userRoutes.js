@@ -1,10 +1,14 @@
 import express from "express";
+
 import userController from "../controllers/userController.js";
+
+import registerSchema from "../validation/UserSchema.js";
+
 import validate from "../middleware/validate.js";
-import registerSchema from "../validation/registerSchema.js";
 import auth from "../middleware/auth.js";
 import checkRole from "../middleware/checkRole.js";
 import uploads from "../middleware/upload.js";
+
 
 const router = express.Router();
 

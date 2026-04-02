@@ -5,7 +5,10 @@ import express from "express";
 
 import HttpError from "./middleware/HttpError.js";
 import connectDB from "./config/db.js";
+
 import userRoutes from "./routes/userRoutes.js";
+import adminRoutes from "./routes/adminRoutes.js";
+
 
 const app = express();
 
@@ -13,24 +16,32 @@ app.use(express.json());
 
 // Routes
 app.use("/users", userRoutes);
+app.use("/admin",adminRoutes);
+
 
 app.get("/", (req, res) => {
-  res.json("hello from server");
+  res.json("Hello from server");
 });
+
 
 // 404 handler
 app.use((req, res, next) => {
   next(new HttpError("Requested route not found", 404));
 });
 
+
 // Error middleware
 app.use((error, req, res, next) => {
-  if (res.headersSent) return next(error);
+
+  if (res.headersSent) {
+    return next(error);
+  }
 
   res.status(error.statusCode || 500).json({
     message: error.message || "Internal server error",
   });
 });
+
 
 async function startServer() {
   try {
