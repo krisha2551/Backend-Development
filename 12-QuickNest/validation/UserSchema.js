@@ -33,9 +33,17 @@ const UserSchema = Joi.object({
       "string.empty": "Phone is required",
     }),
 
+  profilePic: Joi.string().label("profilePic").messages({
+    "string.base": "url must be in string format",
+  }),
+
   role: Joi.string()
-    .valid("user", "admin", "super admin")
-    .default("user")
+    .valid("customer", "provider", "admin", "super_admin")
+    .optional()
+    .label("Role")
+    .messages({
+      "string.empty": "role is required from any of these customer. provider,admin,super_admin",
+    }),
 });
 
 
@@ -46,13 +54,15 @@ export const createUserSchema = UserSchema.fork(
 );
 
 export const updateUserSchema = UserSchema.fork(
-  ["name", "password", "phone"],
-  (fields) =>
-    fields.optional().messages({
-      "object.missing":
-        "name or password or phone any of these field is required when updating",
-    }),
-);
+  ["name", "password", "phone", "profilePic"],
+  (fields) => fields.optional(),
+)
+  .fork(["role", "email"], (fields) => fields.forbidden())
+  .or("name", "password", "phone", "profilePic")
+  .messages({
+    "object.missing":
+      "name, password or phone or profilePic any of these field required when updating",
+  });
 
 
 

@@ -29,7 +29,7 @@ const UserSchema = new mongoose.Schema(
 
     role: {
       type: String,
-      enum: ["customer", "provider", "admin", "super-admin"],
+      enum: ["customer", "provider", "admin", "super_admin"],
       default: "customer",
     },
 
@@ -112,6 +112,25 @@ UserSchema.methods.generateAuthToken = async function () {
   } catch (error) {
     throw new Error(error.message);
   }
+};
+
+
+UserSchema.methods.toJSON = function () {
+  const user = this;
+
+  const userObject = user.toObject();
+
+  delete userObject.password;
+
+  delete userObject.createdAt;
+
+  delete userObject.updatedAt;
+
+  delete userObject.__v;
+
+  delete userObject.tokens;
+
+  return userObject;
 };
 
 const User = mongoose.model("User", UserSchema);

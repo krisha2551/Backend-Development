@@ -2,18 +2,23 @@ import express from "express";
 
 import userController from "../controllers/userController.js";
 
-import registerSchema from "../validation/UserSchema.js";
-
 import validate from "../middleware/validate.js";
 import auth from "../middleware/auth.js";
 import checkRole from "../middleware/checkRole.js";
 import uploads from "../middleware/upload.js";
 
+import {createUserSchema,updateUserSchema} from "../validation/UserSchema.js";
+
 
 const router = express.Router();
 
 // ADD USER
-router.post("/add", validate(registerSchema),uploads.single("profilePic"), userController.add);
+router.post(
+  "/add", 
+  uploads.single("profilePic"),
+  validate(createUserSchema),
+  userController.add);
+
 
 // LOGIN USER
 router.post("/login", userController.login);
@@ -37,7 +42,13 @@ router.get(
 );
 
 
-router.patch("/update", auth, userController.update);
+router.patch(
+  "/update",
+  uploads.single("profilePic"),
+  validate(updateUserSchema),
+  auth,
+  userController.update,
+);
 
 
 router.delete("/delete", auth, userController.deleteUser);
