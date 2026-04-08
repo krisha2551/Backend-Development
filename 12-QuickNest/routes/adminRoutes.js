@@ -1,26 +1,126 @@
-
 import express from "express";
 
-import checkRole from "../middleware/checkRole.js";
 import auth from "../middleware/auth.js";
+import checkRole from "../middleware/checkRole.js";
+import validate from "../middleware/validate.js";
 
-import adminController from "../controllers/adminController.js";
+import userController from "../controllers/userController.js";
+import categoryController from "../controllers/categoryController.js";
+import serviceController from "../controllers/serviceController.js";
 
+import {
+  createCategorySchema,
+  updateCategorySchema,
+} from "../validation/categorySchema.js";
+
+import {
+  createServiceSchema,
+  updateServiceSchema,
+} from "../validation/serviceSchema.js";
 
 const router = express.Router();
 
-router.patch(
-    "/update/:id", 
-    auth, 
-    checkRole("admin", "super_admin"), 
-    adminController.updateUserData);
+// ================= USER =================
 
-    
+// GET ALL
+router.get(
+  "/allUser",
+  auth,
+  checkRole("admin", "super_admin"),
+  userController.allUser
+);
+
+
+// UPDATE
+router.patch(
+  "/update/:id",
+  auth,
+  checkRole("admin", "super_admin"),
+  userController.update
+);
+
+
+// DELETE
 router.delete(
-    "/delete/:id", 
-    auth, 
-    checkRole("admin", "super_admin"), 
-    adminController.deleteUser);
+  "/delete/:id",
+  auth,
+  checkRole("admin", "super_admin"),
+  userController.deleteUser
+);
+
+
+
+// ================= CATEGORY =================
+
+// ADD 
+router.post(
+  "/category/add",
+  auth,
+  checkRole("admin", "super_admin"),
+  validate(createCategorySchema),
+  categoryController.add
+);
+
+
+// GET ALL 
+router.get("/category", categoryController.getAll);
+
+
+// UPDATE 
+router.patch(
+  "/category/update/:id",
+  auth,
+  checkRole("admin", "super_admin"),
+  validate(updateCategorySchema),
+  categoryController.update
+);
+
+
+// DELETE 
+router.delete(
+  "/category/delete/:id",
+  auth,
+  checkRole("admin", "super_admin"),
+  categoryController.deleteCategory
+);
+
+
+
+// ================= SERVICE =================
+
+// ADD 
+router.post(
+  "/service/add",
+  auth,
+  checkRole("admin", "super_admin"),
+  validate(createServiceSchema),
+  serviceController.add
+);
+
+
+// GET ALL 
+router.get("/service", serviceController.getAll);
+
+
+// UPDATE 
+router.patch(
+  "/service/update/:id",
+  auth,
+  checkRole("admin", "super_admin"),
+  validate(updateServiceSchema),
+  serviceController.update
+);
+
+
+// DELETE 
+router.delete(
+  "/service/delete/:id",
+  auth,
+  checkRole("admin", "super_admin"),
+  serviceController.deleteService
+);
+
+
 
 
 export default router;

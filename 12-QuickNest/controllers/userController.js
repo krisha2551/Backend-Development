@@ -13,7 +13,6 @@ const add = async (req, res, next) => {
       email,
       password,
       phone,
-      role,
       profilePic: req.file ? req.file.path : "undefined",
       cloudinaryId: req.file ? req.file.filename : "undefined",
     };
@@ -110,7 +109,7 @@ const logOutAll = async (req, res, next) => {
 };
 
 
-// GET ALL USERS
+// GET ALL 
 const allUser = async (req, res, next) => {
   try {
     const users = await User.find({});
@@ -132,7 +131,7 @@ const allUser = async (req, res, next) => {
 };
 
 
-// UPDATE USER
+// UPDATE 
 const update = async (req, res, next) => {
   try {
     const user = req.user;
@@ -181,7 +180,7 @@ const update = async (req, res, next) => {
 };
 
 
-// DELETE USER
+// DELETE 
 const deleteUser = async (req, res, next) => {
   try {
     const user = req.user;

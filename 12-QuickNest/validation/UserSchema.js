@@ -47,12 +47,15 @@ const UserSchema = Joi.object({
 });
 
 
+//CREATE
 export const createUserSchema = UserSchema.fork(
   ["name", "email", "password", "phone"],
     (field) => field.required()
         .messages({ "any.required": "{#label} is required" }) 
 );
 
+
+//UPDATE
 export const updateUserSchema = UserSchema.fork(
   ["name", "password", "phone", "profilePic"],
   (fields) => fields.optional(),
