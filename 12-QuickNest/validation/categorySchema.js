@@ -8,12 +8,14 @@ const CategorySchema = Joi.object({
       "string.base": "Name must be a string",
       "string.empty": "Category name is required",
       "string.min": "Name must be at least 3 characters",
+      "string.max": "Category name must not exceed 50 characters",
     }),
 
   description: Joi.string()
     .trim()
     .messages({
-      "string.base": "Description must be a string",
+      "string.base": "Description must be a string format",
+      "string.max": "Description must not exceed 500 characters",
     }),
 });
 

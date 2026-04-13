@@ -63,7 +63,21 @@ router.post(
 
 
 // GET ALL 
-router.get("/category", categoryController.getAll);
+router.get(
+  "/category",
+  auth,
+  checkRole("admin", "super_admin"),
+  categoryController.getAll
+);
+
+
+// Get ALL ID BY  
+router.get(
+  "/category/:id",
+  auth,
+  checkRole("admin", "super_admin"),
+  categoryController.getById,
+);
 
 
 // UPDATE 
@@ -99,7 +113,21 @@ router.post(
 
 
 // GET ALL 
-router.get("/service", serviceController.getAll);
+router.get(
+  "/service",
+  auth,
+  checkRole("admin", "super_admin"),
+  serviceController.getAll,
+);
+
+
+// Get ALL ID BY
+router.get(
+  "/service/:id",
+  auth,
+  checkRole("admin", "super_admin"),
+  serviceController.getById,
+);
 
 
 // UPDATE 

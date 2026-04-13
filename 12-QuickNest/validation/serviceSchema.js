@@ -8,7 +8,16 @@ const ServiceSchema = Joi.object({
       "string.base": "Service name must be a string",
       "string.empty": "Service name is required",
       "string.min": "Service name must be at least 3 characters",
+      "string.max": "Service name must not exceed 50 characters",
     }),
+
+  description: Joi.string()
+    .trim()
+    .messages({
+      "string.base": "Description must be a string format",
+      "string.max": "Description must not exceed 500 characters",
+    }),
+
 
   price: Joi.number()
     .min(0)
@@ -26,15 +35,11 @@ const ServiceSchema = Joi.object({
       "any.required": "Duration is required",
     }),
 
-  description: Joi.string()
-    .trim()
-    .messages({
-      "string.base": "Description must be a string",
-    }),
 
   category: Joi.string()
     .trim()
     .messages({
+      "string.empty": "Category is required",
       "string.base": "Invalid category ID",
       "any.required": "Category is required",
     }),

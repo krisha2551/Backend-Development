@@ -97,7 +97,10 @@ UserSchema.methods.generateAuthToken = async function () {
     const user = this;
 
     const token = jwt.sign(
-      { _id: user._id.toString() },
+      {
+        _id: user._id.toString(),
+        role: user.role,
+      },
       process.env.JWT_SECRET,
       {
         expiresIn: "7d",
@@ -107,12 +110,13 @@ UserSchema.methods.generateAuthToken = async function () {
     user.tokens = user.tokens.concat({ token });
 
     await user.save();
-    
-    return token; 
+
+    return token;
   } catch (error) {
     throw new Error(error.message);
   }
 };
+
 
 
 UserSchema.methods.toJSON = function () {

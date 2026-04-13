@@ -5,6 +5,12 @@ const serviceSchema = new mongoose.Schema(
     name: {
       type: String,
       required: true,
+      unique: true,
+      trim: true,
+    },
+
+    description: {
+      type: String,
       trim: true,
     },
 
@@ -20,13 +26,9 @@ const serviceSchema = new mongoose.Schema(
       min: 1,
     },
 
-    description: {
-      type: String,
-      trim: true,
-    },
-
     category: {
       type: mongoose.Schema.Types.ObjectId,
+      ref:"Category",
       required: true,
     },
 
