@@ -20,7 +20,7 @@ const categorySchema = new mongoose.Schema(
 );
 
 categorySchema.virtual("services", {
-  ref: "Services",
+  ref: "Service",
   localField: "_id",
   foreignField: "category",
 });

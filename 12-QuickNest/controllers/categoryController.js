@@ -35,7 +35,11 @@ const add = async (req, res, next) => {
 // GET ALL
 const getAll = async (req, res, next) => {
   try {
-    const categories = await Category.find().populate("services");
+    const categories = await Category.find({}).populate("services","name price duration");
+
+    if(categories.length === 0) {
+      return res.status(200).json({success:true,message:"no category found"})
+    }
 
     res.status(200).json({
       success: true,
@@ -149,6 +153,7 @@ const  deleteCategory = async (req, res, next) => {
 export default {
   add,
   getAll,
+  getById,
   update,
   deleteCategory ,
 };

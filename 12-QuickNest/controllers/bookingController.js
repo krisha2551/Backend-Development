@@ -14,13 +14,13 @@ const createBooking = async (req, res, next) => {
     const service = await Service.findById(serviceId);
 
      if (!service) {
-      return next(new HttpError("service not found", 404));
+      return next(new HttpError("Service not found", 404));
     }
 
     if (!service.isActive) {
       return next(
         new HttpError(
-            "service is currently not active please try again after some time", 
+            "Service is currently not active please try again after some time", 
             400),
       );
     }
@@ -43,7 +43,7 @@ const createBooking = async (req, res, next) => {
 
     if (existingBooking) {
       return next(
-        new HttpError("service already booked for this time slot ", 409),
+        new HttpError("Service already booked for this time slot ", 409),
       );
     }
 
@@ -60,14 +60,25 @@ const createBooking = async (req, res, next) => {
 
     await newBooking.save();
 
-    await newBooking.populate("serviceId");
+    await newBooking.populate([
+      {
+        path: "serviceId",
+        select:"name price duration",
+      },
+      {
+        path:"userId",
+        select: "name email phone",
+      },
+    ]);
 
-    await newBooking.populate("userId");
+    // await newBooking.populate("serviceId");
+
+    // await newBooking.populate("userId");
 
 
     res.status(201).json({
       success: true,
-      message: "service booked successfully",
+      message: "Service booked successfully",
       newBooking,
     });
   } catch (error) {
