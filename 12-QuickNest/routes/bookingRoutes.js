@@ -30,5 +30,21 @@ router.get(
 );
 
 
+// GET BOOKINGS BY CATEGORY ID
+router.get(
+  "/category/:id",
+  auth,
+  bookingController.getAllBookingByCategory
+);
+
+
+// GET BOOKINGS BY USER ID
+router.get(
+  "/user/:id",
+  auth,
+  bookingController.getAllBookingByUser
+);
+
+
 
 export default router;

@@ -195,5 +195,119 @@ const getAllService = async (req, res, next) => {
 };
 
 
-export default { createBooking, getAllBooking, getAllService };
+
+// GET ALL BOOKINGS BY CATEGORY ID
+const getAllBookingByCategory = async (req, res, next) => {
+  try {
+    let bookings;
+    const Role = req.user.role;
+    const categoryId = req.params.id;
+
+    const services = await Service.find({ category: categoryId });
+    
+
+    if (Role === "admin" || Role === "super_admin") {
+      bookings = await Booking.find({
+        serviceId: serviceIds ,
+      }).populate([
+        {
+          path: "serviceId",
+          select: "name price duration description",
+        },
+        {
+          path: "userId",
+          select: "name email phone",
+        },
+      ]);
+    } 
+    
+    else if (Role === "customer") {
+
+      bookings = await Booking.find({ userId }).populate([
+        {
+          path: "serviceId",
+          select: "name price duration description",
+        },
+      ]);
+    }  
+    
+    else {
+      return next(new HttpError("unAuthorized Access", 401));
+    }
+
+    if (bookings.length === 0) {
+      return res.status(200).json({
+        success: true,
+        message: "No bookings found for this category",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Bookings by category fetched successfully",
+      bookings,
+    });
+  } catch (error) {
+    next(new HttpError(error.message, 500));
+  }
+};
+
+
+// GET ALL BOOKINGS BY USER ID
+const getAllBookingByUser = async (req, res, next) => {
+  try {
+    let bookings;
+    const Role = req.user.role;
+    const userId = req.params.id;
+
+    if (Role === "admin" || Role === "super_admin") {
+      bookings = await Booking.find({ userId }).populate([
+        {
+          path: "serviceId",
+          select: "name price duration description",
+        },
+        {
+          path: "userId",
+          select: "name email phone",
+        },
+      ]);
+    } 
+    
+    else if (Role === "customer") {
+      bookings = await Booking.find({ userId }).populate([
+        {
+          path: "serviceId",
+          select: "name price duration description",
+        },
+      ]);
+    }
+    else {
+      return next(new HttpError("unAuthorized Access", 401));
+    }
+
+    if (bookings.length === 0) {
+      return res.status(200).json({
+        success: true,
+        message: "No bookings found for this user",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Bookings by user fetched successfully",
+      bookings,
+    });
+  } catch (error) {
+    next(new HttpError(error.message, 500));
+  }
+};
+
+
+export default {
+  createBooking,
+  getAllBooking,
+  getAllService,
+  getAllBookingByCategory,
+  getAllBookingByUser,
+};
 
