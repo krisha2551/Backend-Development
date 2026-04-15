@@ -36,6 +36,7 @@ const createBooking = async (req, res, next) => {
     const existingBooking = await Booking.findOne({
       serviceId,
       bookingDate: { $gte: startOfDay, $lt: endOfDay },
+      timeSlot,
       status: { $in: ["pending", "confirmed"] },
     });
 
@@ -196,106 +197,88 @@ const getAllService = async (req, res, next) => {
 
 
 
-// GET ALL BOOKINGS BY CATEGORY ID
-const getAllBookingByCategory = async (req, res, next) => {
+// GET BOOKING BY ID
+const getBookingById = async (req, res, next) => {
   try {
-    let bookings;
-    const Role = req.user.role;
-    const categoryId = req.params.id;
+    const bookingId = req.params.id;
 
-    const services = await Service.find({ category: categoryId });
-    
+    const booking = await Booking.findById(bookingId).populate([
+      {
+        path: "serviceId",
+        select: "name price duration description",
+      },
+      {
+        path: "userId",
+        select: "name email phone",
+      },
+    ]);
 
-    if (Role === "admin" || Role === "super_admin") {
-      bookings = await Booking.find({
-        serviceId: serviceIds ,
-      }).populate([
-        {
-          path: "serviceId",
-          select: "name price duration description",
-        },
-        {
-          path: "userId",
-          select: "name email phone",
-        },
-      ]);
-    } 
-    
-    else if (Role === "customer") {
-
-      bookings = await Booking.find({ userId }).populate([
-        {
-          path: "serviceId",
-          select: "name price duration description",
-        },
-      ]);
-    }  
-    
-    else {
-      return next(new HttpError("unAuthorized Access", 401));
+    if (!booking) {
+      return next(new HttpError("Booking not found", 404));
     }
 
-    if (bookings.length === 0) {
-      return res.status(200).json({
-        success: true,
-        message: "No bookings found for this category",
-      });
+    if (
+      req.user.role === "customer" &&
+      booking.userId._id.toString() !== req.user._id.toString()
+    ) {
+      return next(new HttpError("unAuthorized access", 401));
     }
 
     res.status(200).json({
       success: true,
-      message: "Bookings by category fetched successfully",
-      bookings,
+      message: "Booking fetched successfully",
+      booking,
     });
+
   } catch (error) {
     next(new HttpError(error.message, 500));
   }
 };
 
 
-// GET ALL BOOKINGS BY USER ID
-const getAllBookingByUser = async (req, res, next) => {
+// GET BOOKINGS (Admin → any user | Customer → own only)
+const getBookingsByUserId = async (req, res, next) => {
   try {
+
+    const requestedUserId = req.params.id || req.user._id;
+
     let bookings;
-    const Role = req.user.role;
-    const userId = req.params.id;
 
-    if (Role === "admin" || Role === "super_admin") {
-      bookings = await Booking.find({ userId }).populate([
-        {
-          path: "serviceId",
-          select: "name price duration description",
-        },
-        {
-          path: "userId",
-          select: "name email phone",
-        },
-      ]);
-    } 
-    
-    else if (Role === "customer") {
-      bookings = await Booking.find({ userId }).populate([
-        {
-          path: "serviceId",
-          select: "name price duration description",
-        },
-      ]);
-    }
-    else {
-      return next(new HttpError("unAuthorized Access", 401));
-    }
+    bookings = await Booking.find({ userId: requestedUserId });
 
-    if (bookings.length === 0) {
-      return res.status(200).json({
-        success: true,
-        message: "No bookings found for this user",
-      });
+    if (!bookings) {
+      return next(new HttpError("booking data not found", 404));
     }
 
     res.status(200).json({
       success: true,
-      message: "Bookings by user fetched successfully",
-      bookings,
+      message: "booking data fetched successfully",
+      bookings
+    });
+
+  } catch (error) {
+    next(new HttpError(error.message, 500));
+  }
+};
+
+
+// CANCEL BOOKING (Customer)
+const cancelBooking = async (req, res, next) => {
+  try {
+    const booking = await Booking.findById(req.params.id);
+
+    if (!booking) {
+      return next(new HttpError("Booking not found", 404));
+    }
+
+   
+    booking.status = "cancelled";
+    await booking.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Booking cancelled successfully",
+      booking,
     });
   } catch (error) {
     next(new HttpError(error.message, 500));
@@ -307,7 +290,8 @@ export default {
   createBooking,
   getAllBooking,
   getAllService,
-  getAllBookingByCategory,
-  getAllBookingByUser,
+  getBookingById, 
+  getBookingsByUserId,
+  cancelBooking,
 };
 
