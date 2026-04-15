@@ -22,6 +22,13 @@ router.get(
 );
 
 
+// GET own bookings (customer)
+router.get(
+  "/user",
+   auth, 
+   bookingController.getBookingsByUserId);
+
+
 // GET BOOKINGS BY SERVICE ID
 router.get(
   "/service/:id",
@@ -30,21 +37,27 @@ router.get(
 );
 
 
-// GET BOOKINGS BY CATEGORY ID
+// GET BOOKING BY ID
 router.get(
-  "/category/:id",
+  "/:id",
   auth,
-  bookingController.getAllBookingByCategory
+  bookingController.getBookingById
 );
 
 
-// GET BOOKINGS BY USER ID
+// GET bookings by userId (admin)
 router.get(
-  "/user/:id",
-  auth,
-  bookingController.getAllBookingByUser
+  "/user/:id", 
+  auth, 
+  bookingController.getBookingsByUserId
 );
 
 
+// CANCEL
+router.patch(
+  "/cancel/:id", 
+  auth, 
+  bookingController.cancelBooking
+);
 
 export default router;
