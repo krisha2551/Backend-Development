@@ -53,4 +53,11 @@ router.get(
 );
 
 
+// CANCEL
+router.patch(
+  "/cancel/:id", 
+  auth, 
+  bookingController.cancelBooking
+);
+
 export default router;

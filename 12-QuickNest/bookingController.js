@@ -262,11 +262,36 @@ const getBookingsByUserId = async (req, res, next) => {
 };
 
 
+// CANCEL BOOKING (Customer)
+const cancelBooking = async (req, res, next) => {
+  try {
+    const booking = await Booking.findById(req.params.id);
+
+    if (!booking) {
+      return next(new HttpError("Booking not found", 404));
+    }
+
+   
+    booking.status = "cancelled";
+    await booking.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Booking cancelled successfully",
+      booking,
+    });
+  } catch (error) {
+    next(new HttpError(error.message, 500));
+  }
+};
+
+
 export default {
   createBooking,
   getAllBooking,
   getAllService,
   getBookingById, 
   getBookingsByUserId,
+  cancelBooking,
 };
 
