@@ -1,7 +1,7 @@
 import express from "express";
 import bookingController from "../controllers/bookingController.js";
 import auth from "../middleware/auth.js";
-
+import checkRole from "../middleware/checkRole.js";
 
 const router = express.Router();
 
@@ -14,7 +14,7 @@ router.post(
 );
 
 
-// GET ALL BOOKINGS
+// ALL BOOKINGS
 router.get(
   "/all",
   auth,
@@ -22,14 +22,15 @@ router.get(
 );
 
 
-// GET own bookings (customer)
+// Own bookings (customer)
 router.get(
   "/user",
-   auth, 
-   bookingController.getBookingsByUserId);
+  auth,
+  bookingController.getBookingsByUserId
+);
 
 
-// GET BOOKINGS BY SERVICE ID
+// BOOKINGS BY SERVICE ID
 router.get(
   "/service/:id",
   auth,
@@ -37,27 +38,55 @@ router.get(
 );
 
 
-// GET BOOKING BY ID
+// BOOKING BY ID
 router.get(
-  "/:id",
+  "/my/:id",
   auth,
   bookingController.getBookingById
 );
 
 
-// GET bookings by userId (admin)
+// Bookings by userId (admin)
 router.get(
-  "/user/:id", 
-  auth, 
+  "/user/:id",
+  auth,
+  checkRole("admin", "super_admin"),
   bookingController.getBookingsByUserId
 );
 
 
-// CANCEL
-router.patch(
-  "/cancel/:id", 
-  auth, 
-  bookingController.cancelBooking
+// AVAILABLE TIME SLOTS
+router.get(
+  "/availableTimeSlots",
+  auth,
+  bookingController.availableTimeSlots
 );
+
+
+// CONFIRM BOOKING
+router.patch(
+  "/confirm/:id",
+  auth,
+  checkRole("admin", "super_admin"),
+  bookingController.confirmBookingStatus
+);
+
+
+// CANCEL BOOKING
+router.patch(
+  "/cancel/:id",
+  auth,
+  bookingController.cancelBookingStatus
+);
+
+
+// COMPLETE BOOKING
+router.patch(
+  "/complete/:id",
+  auth,
+  checkRole("admin", "super_admin"),
+  bookingController.completeBookingStatus
+);
+
 
 export default router;
