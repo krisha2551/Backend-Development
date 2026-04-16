@@ -21,8 +21,8 @@ const createBooking = async (req, res, next) => {
     if (!service.isActive) {
       return next(
         new HttpError(
-            "Service is currently not active please try again after some time", 
-            400),
+            "Service is currently not active, please try later", 
+            400)
       );
     }
 
@@ -40,10 +40,8 @@ const createBooking = async (req, res, next) => {
       status: { $in: ["pending", "confirmed"] },
     });
 
-    console.log("service", existingBooking);
-
-
-    if (existingBooking) {
+   
+   if (existingBooking) {
       return next(
         new HttpError("Service already booked for this time slot ", 409),
       );
@@ -121,13 +119,13 @@ const getAllBooking = async (req, res, next) => {
       ]);
     }
     else {
-      return next(new HttpError("unAuthorized Access", 401));
+      return next(new HttpError("Unauthorized Access", 401));
     }
 
     if (bookings.length === 0) {
       return res.status(200).json({
         success: true,
-        message: "Booking data not found",
+        message: "No bookings found",
       });
     }
 
@@ -174,19 +172,19 @@ const getAllService = async (req, res, next) => {
     } 
     
    else {
-      return next(new HttpError("unAuthorization access", 401));
+      return next(new HttpError("Unauthorized access", 401));
     }
 
     if (bookings.length === 0) {
       return res.status(200).json({
         success: true,
-        message: "Booking data not found",
+        message: "No booking data found",
       });
     }
 
     res.status(200).json({
       success: true,
-      message: "All booking service fetched successfully!!!!",
+      message: "Service bookings fetched successfully",
       bookings,
     });
 
@@ -246,14 +244,14 @@ const getBookingsByUserId = async (req, res, next) => {
 
     bookings = await Booking.find({ userId: requestedUserId });
 
-    if (!bookings) {
-      return next(new HttpError("booking data not found", 404));
+    if (!bookings.length) {
+      return next(new HttpError("No booking data found", 404));
     }
 
     res.status(200).json({
       success: true,
-      message: "booking data fetched successfully",
-      bookings
+      message: "Booking data fetched successfully",
+      bookings,
     });
 
   } catch (error) {
@@ -261,29 +259,102 @@ const getBookingsByUserId = async (req, res, next) => {
   }
 };
 
+// const getBookingsByUserId = async (req, res, next) => {
+//   try{
+    
+//     let booking;
 
-// CANCEL BOOKING (Customer)
-const cancelBooking = async (req, res, next) => {
-  try {
-    const booking = await Booking.findById(req.params.id);
+//     let loginUser = req.user._id;
 
-    if (!booking) {
-      return next(new HttpError("Booking not found", 404));
+//     let userId = req.params.id;
+
+//     if (loginUser) {
+//       booking = await Booking.find({ userId: loginUser });
+//     }
+
+//     if (userId) {
+//       booking = await Booking.find({ userId });
+//     }
+
+//     if (!booking.length) {
+//       return next(new HttpError("No booking data found", 404))
+//     }
+
+//     res.status(200).json({
+//       success: true,
+//       message: "Booking data fetched successfully",
+//       booking,
+//     })
+//   }catch(error){
+//     next(new HttpError(error.message, 500));
+//   }
+// };
+
+
+
+// AVAILABLE TIME SLOTS
+const availableTimeSlots = async (req, res, next) => {
+
+ try{
+
+   const { serviceId, bookingDate } = req.query
+
+    const service = await Service.findById(serviceId)
+
+    if (!service) {
+      return next(new HttpError("Service not found", 404));
     }
 
-   
-    booking.status = "cancelled";
-    await booking.save();
+    const startOfDay = new Date(bookingDate);
+    startOfDay.setHours(0, 0, 0, 0);
 
+    const endOfDay = new Date(bookingDate);
+    endOfDay.setHours(23, 59, 59, 999);
+
+
+    const bookings = await Booking.find({
+      serviceId,
+      bookingDate: {
+        $gte: startOfDay,
+        $lte: endOfDay,
+      },
+      status: { 
+        $in: ["pending", "confirmed"] 
+      },
+    });
+
+    const bookedSlots = bookings.map((b) => b.timeSlot);
+
+    const allTimeSlots = [
+        "09:00 AM - 10:00 AM",
+        "10:00 AM - 11:00 AM",
+        "11:00 AM - 12:00 PM",
+        "12:00 PM - 01:00 PM",
+        "02:00 PM - 03:00 PM",
+        "03:00 PM - 04:00 PM",
+        "04:00 PM - 05:00 PM",
+        "05:00 PM - 06:00 PM"
+      ]
+
+    const availableTimeSlots = allTimeSlots.filter(
+      (slot) => !bookedSlots.includes(slot));
+
+    
     res.status(200).json({
       success: true,
-      message: "Booking cancelled successfully",
-      booking,
+      message: availableTimeSlots.length
+        ? "Available time slots fetched successfully"
+        : "No available time slots",
+      availableTimeSlots,
     });
   } catch (error) {
     next(new HttpError(error.message, 500));
   }
 };
+
+
+
+
 
 
 export default {
@@ -292,6 +363,7 @@ export default {
   getAllService,
   getBookingById, 
   getBookingsByUserId,
-  cancelBooking,
+  availableTimeSlots,
+
 };
 
