@@ -57,4 +57,45 @@ const registerAsProvider = async (req, res, next) => {
   }
 };
 
-export default { registerAsProvider };
+
+const getProviders = async (req, res, next) => {
+  try {
+
+    const { isVerified } = req.query;
+
+    let query = {};
+
+    if (isVerified !== undefined) {
+      query.isVerified = isVerified === "true";
+    }
+
+    const providers = await Provider.find(query)
+      .populate({
+        path: "userId",
+        select: "name email phone",
+      })
+      .populate({
+        path: "services",
+        select: "name",
+      });
+
+    if (!providers.length) {
+      return next(new HttpError("No providers found", 404));
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Provider details fetched successfully",
+      count: providers.length,
+      providers,
+    });
+
+  } catch (error) {
+    next(error);
+  }
+};
+
+
+export default { registerAsProvider, getProviders, };
+
+

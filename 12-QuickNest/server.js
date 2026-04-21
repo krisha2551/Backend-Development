@@ -9,6 +9,7 @@ import connectDB from "./config/db.js";
 import userRoutes from "./routes/userRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
 import bookingRoutes from "./routes/bookingRoutes.js";
+import providerRoutes from "./routes/providerRoutes.js";
 
 
 // import Service from "./models/Service.js";
@@ -26,7 +27,9 @@ app.use("/users", userRoutes);
 
 app.use("/admin", adminRoutes);
 
-app.use("/booking", bookingRoutes)
+app.use("/booking", bookingRoutes);
+
+app.use("/provider", providerRoutes);
 
 
 
