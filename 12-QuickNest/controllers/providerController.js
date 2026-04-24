@@ -1,22 +1,27 @@
 import Provider from "../models/Provider.js";
 import Service from "../models/Service.js";
 import User from "../models/User.js";
+
 import HttpError from "../middleware/HttpError.js";
+
+import sendEmail from "../utils/sendEmail.js";
+import {getProviderRegistrationEmailTemplate}  from "../services/emailTemplate.js";
 
 
 const registerAsProvider = async (req, res, next) => {
   try {
 
     const userId = req.user._id;
-
     const { document, experience, services } = req.body;
 
     const user = await User.findById(userId);
+
     if (!user) {
       return next(new HttpError("User not found", 404));
     }
 
     const existingProvider = await Provider.findOne({ userId });
+
     if (existingProvider) {
       return next(
         new HttpError("You are already registered as a provider", 400)
@@ -46,12 +51,19 @@ const registerAsProvider = async (req, res, next) => {
 
     await newProvider.save();
 
+    await sendEmail({
+      to: user.email,
+      subject: "Provider Registration Received",
+      html: getProviderRegistrationEmailTemplate(user.name)
+    });
+
     res.status(201).json({
       success: true,
       message:
         "Registered as provider successfully. Wait for admin verification",
       provider: newProvider,
     });
+
   } catch (error) {
     next(new HttpError(error.message, 500));
   }
@@ -91,7 +103,7 @@ const getProviders = async (req, res, next) => {
     });
 
   } catch (error) {
-    next(error);
+    next(new HttpError(error.message, 500));
   }
 };
 

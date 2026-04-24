@@ -1,11 +1,16 @@
-import User from "../models/User.js";
 import HttpError from "../middleware/HttpError.js";
-
+import User from "../models/User.js";
 import cloudinary from "../config/cloudinary.js";
+
+import sendEmail from "../utils/sendEmail.js";
+import {getWelcomeEmailTemplate}  from "../services/emailTemplate.js";
+
+
 
 // CREATE USER
 const add = async (req, res, next) => {
   try {
+
     const { name, email, password, phone } = req.body;
 
     const newUser = {
@@ -23,10 +28,15 @@ const add = async (req, res, next) => {
 
     await user.save();
 
-    res.status(201).json({
-      success: true,
-      user,
-    });
+    sendEmail({
+      to: newUser.email,
+      subject: "Welcome to QuickNest",
+      html: getWelcomeEmailTemplate(newUser.name)
+    })
+
+    res.status(201).json({ 
+      success: true, 
+      user });
   } catch (error) {
     next(new HttpError(error.message, 500));
   }

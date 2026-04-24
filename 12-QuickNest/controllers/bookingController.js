@@ -3,6 +3,15 @@ import HttpError from "../middleware/HttpError.js";
 import Service from "../models/Service.js";
 import Booking from "../models/Booking.js";
 
+import sendEmail from "../utils/sendEmail.js";
+import {
+ getBookingConfirmationEmailTemplate,
+ getBookingCancelledEmailTemplate,
+ getBookingCompletedEmailTemplate
+} from "../services/emailTemplate.js";
+
+import sendWhatsAppMessage from "../utils/sendWhatsAppMessage.js";
+
 
 // CREATE BOOKING
 const createBooking = async (req, res, next) => {
@@ -12,6 +21,10 @@ const createBooking = async (req, res, next) => {
 
     const userId = req.user._id;
 
+    if (!serviceId || !bookingDate || !timeSlot) {
+      return next(new HttpError("All fields are required", 400));
+    }
+
     const service = await Service.findById(serviceId);
 
      if (!service) {
@@ -20,17 +33,15 @@ const createBooking = async (req, res, next) => {
 
     if (!service.isActive) {
       return next(
-        new HttpError(
-            "This service is currently unavailable, Please try again later", 
-            400)
+        new HttpError("This service is currently unavailable, Please try again later", 400)
       );
     }
 
-    const startOfDay = new Date(bookingDate);
-    startOfDay.setHours(0, 0, 0, 0);
+    const booking = new Date(bookingDate);
 
-    const endOfDay = new Date(bookingDate);
-    endOfDay.setHours(23, 59, 59, 999);
+    const startOfDay = new Date(booking.setHours(0, 0, 0, 0));
+
+    const endOfDay = new Date(booking.setHours(23, 59, 59, 999));
 
 
     const existingBooking = await Booking.findOne({
@@ -75,12 +86,28 @@ const createBooking = async (req, res, next) => {
 
     // await newBooking.populate("userId");
 
+    await sendEmail({
+      to: newBooking.userId.email,
+      subject: "Booking Confirmation",
+      html: getBookingConfirmationEmailTemplate(
+         newBooking.userId.name,
+         newBooking.serviceId.name,
+         bookingDate,
+         timeSlot
+        )
+    });
+
+    await sendWhatsAppMessage(
+      newBooking.userId.phone,
+      "Your booking has been created successfully."
+    );
 
     res.status(201).json({
       success: true,
       message: "Booking created successfully",
       newBooking,
     });
+
   } catch (error) {
     next(new HttpError(error.message, 500));
   }
@@ -377,6 +404,11 @@ const confirmBookingStatus = async (req, res, next) => {
 
     await booking.save();
 
+    await sendWhatsAppMessage(
+      booking.userId.phone,
+      "Your booking has been confirmed."
+    );
+
     res.status(200).json({
       success: true,
       message:"Booking confirmed successfully",
@@ -397,7 +429,9 @@ const cancelBookingStatus = async (req, res, next) => {
 
     const id = req.params.id;
 
-    const booking = await Booking.findById(id);
+    const booking = await Booking.findById(id)
+      .populate("userId","name email phone")
+      .populate("serviceId","name");
 
     if (!booking) {
       return next(new HttpError("Booking not found", 404));
@@ -416,6 +450,21 @@ const cancelBookingStatus = async (req, res, next) => {
     booking.status = "cancelled";
 
     await booking.save();
+
+    await sendEmail({
+      to: booking.userId.email,
+      subject: "Booking Cancelled",
+      html: getBookingCancelledEmailTemplate(
+        booking.userId.name,
+        booking.serviceId.name
+      )
+    });
+
+
+    await sendWhatsAppMessage(
+      booking.userId.phone,
+      "Your booking has been cancelled."
+    );
 
     res.status(200).json({
       success: true,
@@ -438,6 +487,8 @@ const completeBookingStatus = async (req, res, next) => {
     const id = req.params.id
 
     const booking = await Booking.findById(id)
+      .populate("userId","name email")
+      .populate("serviceId","name");
 
     if (!booking) {
       return next(new HttpError("Booking not found", 404));
@@ -456,6 +507,15 @@ const completeBookingStatus = async (req, res, next) => {
     booking.status = "completed";
 
     await booking.save();
+
+    await sendEmail({
+      to: booking.userId.email,
+      subject: "Service Completed",
+      html: getBookingCompletedEmailTemplate(
+        booking.userId.name,
+        booking.serviceId.name
+      )
+    });
 
     res.status(200).json({
       success: true,

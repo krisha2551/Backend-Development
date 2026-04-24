@@ -17,7 +17,7 @@ const providerSchema = new mongoose.Schema(
       },
     ],
 
-   document: {
+    document: {
        type: String,
        required: true,
        trim: true,
