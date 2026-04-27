@@ -2,8 +2,12 @@ import dotenv from "dotenv";
 dotenv.config({ path: "./.env" });
 
 import express from "express";
+import helmet from "helmet";
+import hpp from "hpp";
 
 import HttpError from "./middleware/HttpError.js";
+import { rateLimiter } from "./middleware/rateLimit.js"
+
 import connectDB from "./config/db.js";
 
 import userRoutes from "./routes/userRoutes.js";
@@ -11,15 +15,27 @@ import adminRoutes from "./routes/adminRoutes.js";
 import bookingRoutes from "./routes/bookingRoutes.js";
 import providerRoutes from "./routes/providerRoutes.js";
 
-
 // import Service from "./models/Service.js";
 // import Category from "./models/Category.js";
 
 
-
 const app = express();
 
+// Body parser
 app.use(express.json());
+
+
+// Security Headers
+app.use(helmet());
+
+
+// Prevent HTTP Parameter Pollution
+app.use(hpp());
+
+
+// Rate Limiting
+app.use(rateLimiter);
+
 
 
 // Routes
