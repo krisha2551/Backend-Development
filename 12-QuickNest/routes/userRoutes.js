@@ -6,6 +6,7 @@ import validate from "../middleware/validate.js";
 import auth from "../middleware/auth.js";
 import checkRole from "../middleware/checkRole.js";
 import uploads from "../middleware/upload.js";
+import { authLimiter } from "../middleware/rateLimit.js";
 
 import {createUserSchema,updateUserSchema} from "../validation/UserSchema.js";
 
@@ -17,21 +18,39 @@ router.post(
   "/add", 
   uploads.single("profilePic"),
   validate(createUserSchema),
-  userController.add);
+  userController.add
+);
 
 
 // LOGIN USER
-router.post("/login", userController.login);
+router.post(
+  "/login", 
+  authLimiter, 
+  userController.login
+);
 
 
 // PROTECTED
-router.get("/authLogin", auth, userController.authLogin);
+router.get(
+  "/authLogin", 
+  authLimiter, 
+  auth, 
+  userController.authLogin
+);
 
 
-router.post("/logOut", auth, userController.logOut);
+router.post(
+  "/logOut", 
+  auth, 
+  userController.logOut
+);
 
 
-router.post("/logOutAll", auth, userController.logOutAll);
+router.post(
+  "/logOutAll", 
+  auth, 
+  userController.logOutAll
+);
 
 
 router.get(
@@ -51,6 +70,10 @@ router.patch(
 );
 
 
-router.delete("/delete", auth, userController.deleteUser);
+router.delete(
+  "/delete", 
+  auth, 
+  userController.deleteUser
+);
 
 export default router;
