@@ -8,7 +8,8 @@ import checkRole from "../middleware/checkRole.js";
 import uploads from "../middleware/upload.js";
 import { authLimiter } from "../middleware/rateLimit.js";
 
-import {createUserSchema,updateUserSchema} from "../validation/UserSchema.js";
+import { createUserSchema, updateUserSchema } from "../validation/UserSchema.js";
+import { forgetPasswordSchema, resetPasswordSchema } from "../validation/passwordSchema.js";
 
 
 const router = express.Router();
@@ -57,7 +58,7 @@ router.get(
   "/allUser",
   auth,
   checkRole("admin", "super_admin"),
-  userController.allUser,
+  userController.allUser
 );
 
 
@@ -66,7 +67,7 @@ router.patch(
   uploads.single("profilePic"),
   validate(updateUserSchema),
   auth,
-  userController.update,
+  userController.update
 );
 
 
@@ -75,5 +76,20 @@ router.delete(
   auth, 
   userController.deleteUser
 );
+
+
+router.post(
+  "/forget-password",
+  validate(forgetPasswordSchema),
+  userController.forgetPassword
+);
+
+
+router.post(
+  "/reset-password/:token",
+  validate(resetPasswordSchema),
+  userController.resetPassword
+);
+
 
 export default router;

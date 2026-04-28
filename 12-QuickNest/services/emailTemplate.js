@@ -582,6 +582,191 @@ font-size:12px;
 
 
 
+export const getForgotPasswordEmailTemplate = (
+  userName,
+  resetUrl
+) => {
+return `
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
+
+body{
+font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;
+background:#f4f4f4;
+line-height:1.6;
+color:#333;
+}
+
+.email-container{
+max-width:600px;
+margin:20px auto;
+background:#fff;
+border-radius:8px;
+box-shadow:0 2px 8px rgba(0,0,0,0.1);
+overflow:hidden;
+}
+
+.header{
+background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);
+padding:40px 20px;
+text-align:center;
+color:#fff;
+}
+
+.header h1{
+font-size:28px;
+margin-bottom:8px;
+}
+
+.header p{
+font-size:14px;
+opacity:0.9;
+}
+
+.content{
+padding:40px 30px;
+}
+
+.greeting{
+font-size:18px;
+margin-bottom:20px;
+}
+
+.greeting strong{
+color:#667eea;
+}
+
+.message{
+font-size:15px;
+color:#555;
+margin-bottom:25px;
+line-height:1.8;
+}
+
+.features{
+background:#f8f9fa;
+padding:25px;
+border-radius:6px;
+margin:25px 0;
+}
+
+.features p{
+font-size:14px;
+padding:8px 0;
+color:#555;
+}
+
+.cta-button{
+display:inline-block;
+background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);
+color:#fff !important;
+padding:14px 35px;
+text-decoration:none;
+border-radius:5px;
+font-size:16px;
+font-weight:600;
+margin:25px 0;
+}
+
+.support-text{
+font-size:14px;
+color:#777;
+margin-top:25px;
+padding-top:20px;
+border-top:1px solid #eee;
+}
+
+.footer{
+background:#f8f9fa;
+padding:25px 30px;
+text-align:center;
+border-top:1px solid #eee;
+}
+
+.footer p{
+font-size:12px;
+color:#888;
+margin:8px 0;
+}
+
+@media only screen and (max-width:600px){
+
+.email-container{
+margin:0;
+border-radius:0;
+}
+
+.content{
+padding:30px 20px;
+}
+
+.cta-button{
+display:block;
+text-align:center;
+}
+
+}
+
+</style>
+</head>
+<body>
+
+<div class="email-container">
+
+<div class="header">
+<h1>🔐 Reset Your Password</h1>
+<p>Password Recovery Request</p>
+</div>
+
+<div class="content">
+
+<div class="greeting">
+Hi <strong>${userName}</strong>,
+</div>
+
+<div class="message">
+We received a request to reset your QuickNest account password.
+Click the button below to set a new password.
+</div>
+
+<div class="features">
+<p>✓ Password reset link generated successfully</p>
+<p>✓ This link will expire in 15 minutes</p>
+<p>✓ Use it only once for security</p>
+</div>
+
+<a href="${resetUrl}" class="cta-button">
+Reset Password
+</a>
+
+<div class="support-text">
+If you did not request this password reset, you can safely ignore this email.
+Your account will remain secure.
+</div>
+
+</div>
+
+<div class="footer">
+<p>© 2026 QuickNest. All rights reserved.</p>
+<p>QuickNest Support | support@quicknest.com</p>
+</div>
+
+</div>
+
+</body>
+</html>
+`;
+};
 
 
 export default {
@@ -589,5 +774,6 @@ export default {
  getProviderRegistrationEmailTemplate,
  getBookingConfirmationEmailTemplate,
  getBookingCancelledEmailTemplate,
- getBookingCompletedEmailTemplate
+ getBookingCompletedEmailTemplate,
+ getForgotPasswordEmailTemplate
 };
