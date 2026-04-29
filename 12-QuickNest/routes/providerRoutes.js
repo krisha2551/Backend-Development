@@ -6,19 +6,40 @@ import checkRole from "../middleware/checkRole.js";
 
 const router = express.Router();
 
+// Register Provider
 router.post(
-  "/register", 
-  auth, 
+  "/register",
+  auth,
   providerController.registerAsProvider
 );
 
 
+// Get Providers (Admin, Super Admin)
 router.get(
-  "/providers",
+  "/getProvider",
   auth,
   checkRole("admin", "super_admin"),
-  providerController.getProviders
+  providerController.getProvider
 );
+
+
+// Provider can get own bookings
+router.get(
+  "/getBookingProvider",
+  auth,
+  checkRole("provider"),
+  providerController.getProviderBooking
+);
+
+
+// Admin can get bookings by provider id
+router.get(
+  "/getBookingProvider/:id",
+  auth,
+  checkRole("admin", "super_admin"),
+  providerController.getProviderBooking
+);
+
 
 
 

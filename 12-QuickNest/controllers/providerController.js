@@ -1,4 +1,5 @@
 import Provider from "../models/Provider.js";
+import Booking from "../models/Booking.js"
 import Service from "../models/Service.js";
 import User from "../models/User.js";
 
@@ -70,7 +71,7 @@ const registerAsProvider = async (req, res, next) => {
 };
 
 
-const getProviders = async (req, res, next) => {
+const getProvider = async (req, res, next) => {
   try {
 
     const { isVerified } = req.query;
@@ -108,6 +109,55 @@ const getProviders = async (req, res, next) => {
 };
 
 
-export default { registerAsProvider, getProviders, };
+// GET PROVIDER BOOKINGS
+const getProviderBooking = async (req, res, next) => {
+  try {
+
+    const userId = req.params.id || req.user._id;
+
+    const user = await Provider.findOne({ userId });
+
+    const role = req.user.role;
+
+    if (!user) {
+      return next(new HttpError("user not found", 404));
+    }
+
+    const bookings = await Booking.find({
+      providerId: user._id
+    });
+
+    if (!bookings || bookings.length === 0) {
+      return next(new HttpError("booking not found", 404));
+    }
+
+    // Provider can only see own bookings
+    if (role === "provider") {
+
+     if (bookings[0].providerId.toString() !== user._id.toString()) {
+        return next(
+          new HttpError("with this provider not access", 400)
+        );
+      }
+
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "booking fetched successfully!!",
+      bookings
+    });
+
+  } catch (error) {
+    next(new HttpError(error.message, 500));
+  }
+};
+
+
+export default { 
+  registerAsProvider, 
+  getProvider, 
+  getProviderBooking
+};
 
 

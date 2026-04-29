@@ -17,7 +17,7 @@ import sendWhatsAppMessage from "../utils/sendWhatsAppMessage.js";
 const createBooking = async (req, res, next) => {
   try {
 
-    const { serviceId, bookingDate, timeSlot, notes } = req.body;
+    const { serviceId, providerId, bookingDate, timeSlot, notes } = req.body;
 
     const userId = req.user._id;
 
@@ -61,6 +61,7 @@ const createBooking = async (req, res, next) => {
 
     const newBooking = new Booking({
       userId,
+      providerId,
       serviceId,
       bookingDate: new Date(bookingDate),
       timeSlot,
