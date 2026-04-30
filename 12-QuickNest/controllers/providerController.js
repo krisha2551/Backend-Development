@@ -115,7 +115,12 @@ const getProviderBooking = async (req, res, next) => {
 
     const userId = req.params.id || req.user._id;
 
-    const user = await Provider.findOne({ userId });
+    console.log("userID",userId)
+
+    const user = await Provider.findOne({userId});
+
+    console.log("user",user)
+
 
     const role = req.user.role;
 
